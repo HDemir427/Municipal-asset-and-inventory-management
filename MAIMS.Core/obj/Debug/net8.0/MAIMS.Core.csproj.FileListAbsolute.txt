@@ -1,0 +1,13 @@
+D:\Homeworks\Staj\maims\src\MAIMS.Core\bin\Debug\net8.0\MAIMS.Core.deps.json
+D:\Homeworks\Staj\maims\src\MAIMS.Core\bin\Debug\net8.0\MAIMS.Core.dll
+D:\Homeworks\Staj\maims\src\MAIMS.Core\bin\Debug\net8.0\MAIMS.Core.pdb
+D:\Homeworks\Staj\maims\src\MAIMS.Core\bin\Debug\net8.0\MAIMS.Core.xml
+D:\Homeworks\Staj\maims\src\MAIMS.Core\obj\Debug\net8.0\MAIMS.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Homeworks\Staj\maims\src\MAIMS.Core\obj\Debug\net8.0\MAIMS.Core.AssemblyInfoInputs.cache
+D:\Homeworks\Staj\maims\src\MAIMS.Core\obj\Debug\net8.0\MAIMS.Core.AssemblyInfo.cs
+D:\Homeworks\Staj\maims\src\MAIMS.Core\obj\Debug\net8.0\MAIMS.Core.csproj.CoreCompileInputs.cache
+D:\Homeworks\Staj\maims\src\MAIMS.Core\obj\Debug\net8.0\MAIMS.Core.dll
+D:\Homeworks\Staj\maims\src\MAIMS.Core\obj\Debug\net8.0\refint\MAIMS.Core.dll
+D:\Homeworks\Staj\maims\src\MAIMS.Core\obj\Debug\net8.0\MAIMS.Core.xml
+D:\Homeworks\Staj\maims\src\MAIMS.Core\obj\Debug\net8.0\MAIMS.Core.pdb
+D:\Homeworks\Staj\maims\src\MAIMS.Core\obj\Debug\net8.0\ref\MAIMS.Core.dll
