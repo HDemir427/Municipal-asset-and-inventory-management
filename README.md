@@ -149,6 +149,4 @@ mysql -u root -p maims < db/50_full_reset.sql
 | Auditor | Read-only access to everything + export |
 | FinanceOfficer | Valuations, depreciation, compliance reports |
 
-## License
 
-MIT
