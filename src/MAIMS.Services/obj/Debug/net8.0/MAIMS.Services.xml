@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MAIMS.Services</name>
+    </assembly>
+    <members>
+        <member name="T:MAIMS.Services.Asset.AssetService">
+            <summary>
+            Business logic for fixed-asset management. Enforces RBAC at the service layer
+            (UI also disables buttons but UI-only enforcement is forbidden by spec §9.1).
+            Every CUD operation goes through IUnitOfWork so the audit interceptor fires.
+            </summary>
+        </member>
+        <member name="M:MAIMS.Services.Asset.AssetService.GetContext">
+            <summary>
+            Returns the inner DbContext from the UnitOfWork. Done via dynamic
+            dispatch to avoid leaking the DbContext type through the IUnitOfWork
+            interface (the interface exposes only SaveChangesAsync/BeginTransactionAsync).
+            </summary>
+        </member>
+        <member name="T:MAIMS.Services.Attachments.AssetAttachmentService">
+            <summary>
+            Service for uploading, listing, and deleting asset attachments.
+            Files are stored on disk under a configurable root (default: ./attachments).
+            The DB stores a relative path reference + metadata.
+            </summary>
+        </member>
+        <member name="M:MAIMS.Services.Attachments.AssetAttachmentService.ListAsync(System.Int64,System.Threading.CancellationToken)">
+            <summary>Lists all attachments for an asset.</summary>
+        </member>
+        <member name="M:MAIMS.Services.Attachments.AssetAttachmentService.UploadAsync(System.Int64,System.String,System.String,System.String,System.Nullable{System.Int64},System.Threading.CancellationToken)">
+            <summary>
+            Uploads a file for an asset. Copies the file to the attachment root,
+            then creates an AssetAttachment record in the DB.
+            </summary>
+        </member>
+        <member name="M:MAIMS.Services.Attachments.AssetAttachmentService.DeleteAsync(System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Deletes an attachment: removes the file from disk and the DB record.
+            </summary>
+        </member>
+        <member name="M:MAIMS.Services.Attachments.AssetAttachmentService.GetDownloadInfoAsync(System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Returns the full path for downloading/viewing an attachment.
+            </summary>
+        </member>
+        <member name="T:MAIMS.Services.Audit.AuditService">
+             <summary>
+             Read side of the audit log. Writes are performed by the EF interceptor via IAuditWriter,
+             so this service exposes only LogAsync (for explicit, non-CUD audit events like LOGIN)
+             and the search/export methods used by auditors.
+            
+             Lifetime: SCOPED (registered as Scoped). Uses IServiceScopeFactory because some callers
+             (like AuditService from a background thread) may need to create their own scope.
+             </summary>
+        </member>
+        <member name="M:MAIMS.Services.Audit.AuditService.PurgeInvalidEntriesAsync(System.String,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Purges audit_log entries with invalid entity_id (≤ 0) or all entries.
+            Requires a ROOT connection string because the BEFORE DELETE trigger
+            must be temporarily dropped. Steps:
+              1. Connect as root
+              2. DROP TRIGGER trg_audit_log_block_delete
+              3. DELETE FROM audit_log WHERE entity_id &lt;= 0 (or all)
+              4. CREATE TRIGGER trg_audit_log_block_delete (recreates immutability)
+              5. Returns the number of rows deleted
+            </summary>
+        </member>
+        <member name="T:MAIMS.Services.Auth.AuthService">
+             <summary>
+             BCrypt-based authentication service. Stores a 11-cost hash per user.
+             Implements the ICurrentSession contract so the rest of the app can read
+             the logged-in user's identity / permissions without re-querying the DB.
+            
+             Lifetime: SINGLETON. Because singleton cannot directly resolve scoped services
+             (MaimsDbContext is scoped via DbContextPool), we inject IServiceScopeFactory
+             and create a fresh scope each time we need a DbContext.
+             </summary>
+        </member>
+        <member name="M:MAIMS.Services.Auth.AuthService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory,System.TimeProvider)">
+            <summary>
+            Construct AuthService with an IServiceScopeFactory.
+            Each operation creates a fresh DI scope to resolve scoped services (DbContext).
+            </summary>
+        </member>
+        <member name="M:MAIMS.Services.Auth.AuthService.HashPassword(System.String)">
+            <summary>
+            Hashes a password using BCrypt at cost 11. Used by the seeder and the user management UI.
+            </summary>
+        </member>
+        <member name="T:MAIMS.Services.Inventory.InventoryService">
+            <summary>
+            Inventory management: item catalog, stock receipt/issue/transfer/adjustment/write-off.
+            Every mutation runs in a transaction that updates StockBalance AND writes a StockTransaction
+            AND fires the audit interceptor — all atomic.
+            </summary>
+        </member>
+        <member name="T:MAIMS.Services.Reference.ReferenceDataService">
+            <summary>
+            Read-only lookup service for reference data. Uses IServiceScopeFactory
+            because the service is registered as Scoped and the DbContext is also Scoped.
+            </summary>
+        </member>
+        <member name="M:MAIMS.Services.ServiceCollectionExtensions.AddMaimsServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Registers all MAIMS business services. Must be called AFTER AddMaimsData()
+            AND after AuthService is registered by the host (Program.cs).
+            AuthService is registered as a singleton because it doubles as the ICurrentSession
+            holder (per-process single active user in the WinForms host).
+            </summary>
+        </member>
+        <member name="T:MAIMS.Services.Validation.AssetCreateValidator">
+            <summary>
+            Validation rules for AssetCreateDto. Enforces required fields, length limits,
+            and ranges consistent with the DB schema.
+            </summary>
+        </member>
+    </members>
+</doc>
